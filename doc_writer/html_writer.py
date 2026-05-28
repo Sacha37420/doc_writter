@@ -81,6 +81,7 @@ class HtmlDocumentWriter(BaseDocumentWriter):
             "callout": self._html_callout,
             "separator": self._html_separator,
             "chart": self._html_chart,
+            "flowchart": self._html_flowchart,
         }
         handler = dispatch.get(tpl["type"])
         return handler(tpl, content) if handler else ""
@@ -289,6 +290,16 @@ class HtmlDocumentWriter(BaseDocumentWriter):
             f'<img src="data:image/png;base64,{b64}" '
             f'style="max-width:100%;width:{width_px}px;display:block;margin:4pt auto;">'
         )
+
+    def _html_flowchart(self, tpl: dict, content: dict) -> str:
+        from .flowchart_utils import build_simple_svg, build_complex_svg
+        ftype = content.get("flowchart_type", "simple")
+        nodes = content.get("nodes", [])
+        if ftype == "simple":
+            svg = build_simple_svg(nodes, tpl)
+        else:
+            svg = build_complex_svg(nodes, content.get("edges", []), tpl)
+        return f'<div style="text-align:center;margin:8pt 0">{svg}</div>'
 
     # ------------------------------------------------------------------
     # Save

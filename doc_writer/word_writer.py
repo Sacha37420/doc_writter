@@ -195,6 +195,7 @@ class WordDocumentWriter(BaseDocumentWriter):
             "callout": self._write_callout,
             "separator": self._write_separator,
             "chart": self._write_chart,
+            "flowchart": self._write_flowchart,
         }
         handler = dispatch.get(tpl["type"])
         if handler:
@@ -378,6 +379,28 @@ class WordDocumentWriter(BaseDocumentWriter):
         para.paragraph_format.space_after = Pt(4)
         width_in = tpl.get("figure", {}).get("width_inches", 6)
         para.add_run().add_picture(buf, width=Inches(width_in))
+
+    def _write_flowchart(self, container, tpl: dict, content: dict) -> None:
+        from docx.shared import Inches
+        from .flowchart_utils import (build_word_simple_flowchart,
+                                      build_complex_png_for_word)
+        ftype = content.get("flowchart_type", "simple")
+        nodes = content.get("nodes", [])
+        if ftype == "simple":
+            drawing = build_word_simple_flowchart(nodes, tpl)
+            para = container.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            para.paragraph_format.space_before = Pt(4)
+            para.paragraph_format.space_after = Pt(4)
+            para.add_run()._r.append(drawing)
+        else:
+            buf = build_complex_png_for_word(nodes, content.get("edges", []), tpl)
+            width_in = tpl.get("figure", {}).get("width_inches", 4.5)
+            para = container.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            para.paragraph_format.space_before = Pt(4)
+            para.paragraph_format.space_after = Pt(4)
+            para.add_run().add_picture(buf, width=Inches(width_in))
 
     # ------------------------------------------------------------------
     # Save

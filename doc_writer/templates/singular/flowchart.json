@@ -1,0 +1,9 @@
+{
+  "id": "flowchart",
+  "type": "flowchart",
+  "font_size": 9,
+  "figure": {
+    "width_inches": 4.5,
+    "dpi": 150
+  }
+}
