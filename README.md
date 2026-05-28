@@ -500,6 +500,50 @@ writer = WordDocumentWriter(custom_templates_dir="mes_templates/")
 
 ---
 
+## Prompt Claude Code — générer la documentation utilisateur d'un projet
+
+Coller ce prompt dans le chat Claude Code d'un autre projet pour qu'il installe `doc_writer` et génère automatiquement une documentation **orientée utilisateur final** (pas développeur) en Word et HTML.
+
+```
+Utilise le module `doc_writer` pour générer la documentation utilisateur de ce projet en Word (.docx) et HTML (.html).
+
+**Étapes à faire dans l'ordre :**
+
+1. Crée un environnement virtuel `.venv` s'il n'existe pas, et installe `doc_writer` dedans :
+   pip install git+https://github.com/sacha-mailler/doc_writter.git
+
+2. Lis le README de `doc_writer` pour comprendre le format JSON attendu — en particulier
+   la section "Format JSON de document" et le "Guide de génération pour une IA".
+
+3. Explore ce projet (code source, structure, fichiers existants) pour en comprendre
+   le fonctionnement et l'usage.
+
+4. Crée le dossier `.doc/` à la racine du projet s'il n'existe pas.
+
+5. Génère un fichier `.doc/documentation.json` qui décrit ce projet selon le format
+   `doc_writer`. La documentation doit être entièrement orientée utilisateur final :
+   - Ce que fait le projet et à quoi il sert concrètement
+   - Comment l'installer et le lancer
+   - Comment l'utiliser au quotidien (cas d'usage, exemples concrets)
+   - Ce que l'utilisateur peut faire / obtenir
+   Ne pas inclure de détails d'implémentation, d'architecture interne ou de concepts
+   réservés aux développeurs.
+
+6. Exécute ce script pour produire les deux sorties :
+
+   from doc_writer import WordDocumentWriter, HtmlDocumentWriter
+   word = WordDocumentWriter()
+   word.write_from_json(".doc/documentation.json")
+   word.save(".doc/documentation.docx")
+   html = HtmlDocumentWriter()
+   html.write_from_json(".doc/documentation.json")
+   html.save(".doc/documentation.html")
+
+Livrable : `.doc/documentation.json`, `.doc/documentation.docx`, `.doc/documentation.html`.
+```
+
+---
+
 ## Structure du projet
 
 ```
