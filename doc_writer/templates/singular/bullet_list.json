@@ -4,11 +4,11 @@
   "bullet": {
     "symbol": "•",
     "color": "{{bullet_color}}",
-    "size": 11
+    "size": 9
   },
   "font": {
     "name": "Calibri",
-    "size": 11,
+    "size": 9,
     "bold": false,
     "italic": false,
     "color": "{{list_text_color}}"

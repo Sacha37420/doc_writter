@@ -30,7 +30,7 @@ class HtmlDocumentWriter(BaseDocumentWriter):
     def __init__(self, custom_templates_dir: Path | str | None = None):
         super().__init__(custom_templates_dir)
         self._blocks: list[str] = []
-        self._body_style = "padding: 25mm 30mm;"
+        self._body_style = "padding: 12mm 15mm;"
 
     # ------------------------------------------------------------------
     # Page setup

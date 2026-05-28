@@ -7,7 +7,7 @@
   "header": {
     "font": {
       "name": "Calibri",
-      "size": 10,
+      "size": 8,
       "bold": true,
       "italic": false,
       "color": "#FFFFFF"
@@ -18,7 +18,7 @@
   "cell": {
     "font": {
       "name": "Calibri",
-      "size": 10,
+      "size": 8,
       "bold": false,
       "italic": false,
       "color": "{{text_color}}"

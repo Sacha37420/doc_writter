@@ -7,14 +7,14 @@
   "padding_pt": 10,
   "font": {
     "name": "Calibri",
-    "size": 11,
+    "size": 9,
     "bold": false,
     "italic": false,
     "color": "{{text_color}}"
   },
   "label_font": {
     "name": "Calibri",
-    "size": 10,
+    "size": 8,
     "bold": true,
     "italic": false,
     "color": "{{callout_border_color}}"

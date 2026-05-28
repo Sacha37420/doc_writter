@@ -11,7 +11,7 @@
   "caption": {
     "font": {
       "name": "Calibri",
-      "size": 9,
+      "size": 8,
       "bold": false,
       "italic": true,
       "color": "{{text_color}}"

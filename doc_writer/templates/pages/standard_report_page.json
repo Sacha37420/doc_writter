@@ -5,7 +5,7 @@
   "description": "Page A4 portrait combinant section héro, contenu avec liste et tableau de données",
   "format": "A4",
   "orientation": "portrait",
-  "margins_mm": { "top": 25, "bottom": 25, "left": 30, "right": 30 },
+  "margins_mm": { "top": 12, "bottom": 12, "left": 15, "right": 15 },
   "sections": [
     { "combined_template": "hero_section" },
     { "combined_template": "content_with_list" },

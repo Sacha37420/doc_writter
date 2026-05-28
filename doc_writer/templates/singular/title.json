@@ -5,32 +5,32 @@
     "1": {
       "font": {
         "name": "Calibri",
-        "size": 22,
-        "bold": true,
-        "italic": false,
-        "color": "{{title_color}}"
-      },
-      "spacing": { "before_pt": 14, "after_pt": 8 }
-    },
-    "2": {
-      "font": {
-        "name": "Calibri",
-        "size": 16,
+        "size": 18,
         "bold": true,
         "italic": false,
         "color": "{{title_color}}"
       },
       "spacing": { "before_pt": 10, "after_pt": 6 }
     },
-    "3": {
+    "2": {
       "font": {
         "name": "Calibri",
         "size": 13,
         "bold": true,
-        "italic": true,
+        "italic": false,
         "color": "{{title_color}}"
       },
       "spacing": { "before_pt": 8, "after_pt": 4 }
+    },
+    "3": {
+      "font": {
+        "name": "Calibri",
+        "size": 11,
+        "bold": true,
+        "italic": true,
+        "color": "{{title_color}}"
+      },
+      "spacing": { "before_pt": 6, "after_pt": 3 }
     }
   }
 }
