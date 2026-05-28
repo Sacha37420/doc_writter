@@ -13,6 +13,7 @@
     "italic": false,
     "color": "{{list_text_color}}"
   },
+  "alignment": "justify",
   "indent_pt": 18,
   "spacing": {
     "before_pt": 2,

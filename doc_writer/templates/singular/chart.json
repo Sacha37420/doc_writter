@@ -1,0 +1,17 @@
+{
+  "id": "chart",
+  "type": "chart",
+  "figure": {
+    "width_inches": 6,
+    "height_inches": 3.5,
+    "dpi": 150
+  },
+  "colors": [
+    "{{chart_color_1}}",
+    "{{chart_color_2}}",
+    "{{chart_color_3}}",
+    "{{chart_color_4}}"
+  ],
+  "font_size": 8,
+  "grid": true
+}

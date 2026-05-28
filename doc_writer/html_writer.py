@@ -80,6 +80,7 @@ class HtmlDocumentWriter(BaseDocumentWriter):
             "table": self._html_table,
             "callout": self._html_callout,
             "separator": self._html_separator,
+            "chart": self._html_chart,
         }
         handler = dispatch.get(tpl["type"])
         return handler(tpl, content) if handler else ""
@@ -146,6 +147,7 @@ class HtmlDocumentWriter(BaseDocumentWriter):
             self._font_style(font_def)
             + f";margin:{sp.get('before_pt', 2)}pt 0"
             + f";line-height:{sp.get('line_spacing', 1.15)}"
+            + f";text-align:{tpl.get('alignment', 'left')}"
             + ";display:flex;align-items:baseline;gap:6px"
         )
         ul_style = f"padding-left:{indent}pt;margin:6pt 0"
@@ -276,6 +278,17 @@ class HtmlDocumentWriter(BaseDocumentWriter):
             f";opacity:0.4"
         )
         return f'<hr style="{style}">'
+
+    def _html_chart(self, tpl: dict, content: dict) -> str:
+        import base64
+        from .chart_utils import render_chart_png
+        buf = render_chart_png(tpl, content)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        width_px = int(tpl.get("figure", {}).get("width_inches", 6) * tpl.get("figure", {}).get("dpi", 150))
+        return (
+            f'<img src="data:image/png;base64,{b64}" '
+            f'style="max-width:100%;width:{width_px}px;display:block;margin:4pt auto;">'
+        )
 
     # ------------------------------------------------------------------
     # Save

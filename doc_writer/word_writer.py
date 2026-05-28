@@ -194,6 +194,7 @@ class WordDocumentWriter(BaseDocumentWriter):
             "table": self._write_table,
             "callout": self._write_callout,
             "separator": self._write_separator,
+            "chart": self._write_chart,
         }
         handler = dispatch.get(tpl["type"])
         if handler:
@@ -236,6 +237,7 @@ class WordDocumentWriter(BaseDocumentWriter):
 
         for item in items:
             para = container.add_paragraph()
+            para.alignment = _ALIGN_MAP.get(tpl.get("alignment", "left"), WD_ALIGN_PARAGRAPH.LEFT)
             para.paragraph_format.left_indent = Pt(indent)
             para.paragraph_format.first_line_indent = Pt(-indent)
             para.paragraph_format.space_before = Pt(sp.get("before_pt", 2))
@@ -365,6 +367,17 @@ class WordDocumentWriter(BaseDocumentWriter):
         bottom.set(qn("w:color"), color)
         pBdr.append(bottom)
         pPr.append(pBdr)
+
+    def _write_chart(self, container, tpl: dict, content: dict) -> None:
+        from docx.shared import Inches
+        from .chart_utils import render_chart_png
+        buf = render_chart_png(tpl, content)
+        para = container.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para.paragraph_format.space_before = Pt(4)
+        para.paragraph_format.space_after = Pt(4)
+        width_in = tpl.get("figure", {}).get("width_inches", 6)
+        para.add_run().add_picture(buf, width=Inches(width_in))
 
     # ------------------------------------------------------------------
     # Save

@@ -8,7 +8,7 @@
     "italic": false,
     "color": "{{text_color}}"
   },
-  "alignment": "left",
+  "alignment": "justify",
   "spacing": {
     "before_pt": 4,
     "after_pt": 4,
