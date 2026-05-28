@@ -127,3 +127,72 @@ html2.add_combined(
 )
 html2.save("output/guide_utilisateur.html")
 print("✓ HTML  →  examples/output/guide_utilisateur.html")
+
+# ---------------------------------------------------------------------------
+# 4. Graphique — chart_section
+# ---------------------------------------------------------------------------
+
+word3 = WordDocumentWriter()
+word3.add_combined(
+    "chart_section",
+    {
+        "title": {"text": "Évolution du chiffre d'affaires", "level": 2},
+        "chart": {
+            "chart_type": "bar",
+            "labels": ["T1", "T2", "T3", "T4"],
+            "datasets": [
+                {"label": "2023", "values": [540, 620, 580, 700]},
+                {"label": "2024", "values": [610, 695, 670, 810]},
+            ],
+        },
+    },
+)
+word3.save("output/graphique.docx")
+print("✓ Word  →  examples/output/graphique.docx")
+
+html3 = HtmlDocumentWriter()
+html3.add_combined(
+    "chart_section",
+    {
+        "title": {"text": "Évolution du chiffre d'affaires", "level": 2},
+        "chart": {
+            "chart_type": "bar",
+            "labels": ["T1", "T2", "T3", "T4"],
+            "datasets": [
+                {"label": "2023", "values": [540, 620, 580, 700]},
+                {"label": "2024", "values": [610, 695, 670, 810]},
+            ],
+        },
+    },
+)
+html3.save("output/graphique.html")
+print("✓ HTML  →  examples/output/graphique.html")
+
+# ---------------------------------------------------------------------------
+# 5. Logigramme simple (formes Word natives — recommandé)
+# ---------------------------------------------------------------------------
+
+FLOWCHART_CONTENT = {
+    "title": {"text": "Processus de traitement des demandes", "level": 2},
+    "flowchart": {
+        "flowchart_type": "simple",   # ← toujours préférer simple
+        "nodes": [
+            {"id": "1", "type": "start",    "text": "Réception de la demande"},
+            {"id": "2", "type": "process",  "text": "Vérifier les informations"},
+            {"id": "3", "type": "decision", "text": "Dossier complet ?"},
+            {"id": "4", "type": "io",       "text": "Enregistrer dans le système"},
+            {"id": "5", "type": "process",  "text": "Notifier le demandeur"},
+            {"id": "6", "type": "end",      "text": "Traitement terminé"},
+        ],
+    },
+}
+
+word4 = WordDocumentWriter()
+word4.add_combined("flowchart_section", FLOWCHART_CONTENT)
+word4.save("output/logigramme.docx")
+print("✓ Word  →  examples/output/logigramme.docx")
+
+html4 = HtmlDocumentWriter()
+html4.add_combined("flowchart_section", FLOWCHART_CONTENT)
+html4.save("output/logigramme.html")
+print("✓ HTML  →  examples/output/logigramme.html")

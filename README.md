@@ -19,13 +19,15 @@ Blocs atomiques dont le style (police, taille, espacement) est **fixé une fois 
 
 | Template | Fichier | Description |
 |----------|---------|-------------|
-| Paragraphe | `singular/paragraph.json` | Bloc de texte courant |
-| Liste à puces | `singular/bullet_list.json` | Liste avec puce et retrait fixes |
+| Paragraphe | `singular/paragraph.json` | Bloc de texte courant, justifié |
+| Liste à puces | `singular/bullet_list.json` | Liste avec puce et retrait fixes, justifiée |
 | Titre | `singular/title.json` | Niveaux 1, 2 et 3 |
 | Image | `singular/image.json` | Cadre fixe avec placeholder |
 | Tableau | `singular/table.json` | Nb colonnes/lignes fixés, style de bordure fixé |
 | Encadré | `singular/callout.json` | Bloc mis en valeur avec bordure gauche colorée |
 | Séparateur | `singular/separator.json` | Ligne horizontale de séparation |
+| Graphique | `singular/chart.json` | Graphique matplotlib (bar, barh, line, pie) |
+| Logigramme | `singular/flowchart.json` | Logigramme simple (Word natif) ou complexe (SVG/PNG) |
 
 #### Placeholders de couleur disponibles
 
@@ -40,6 +42,7 @@ Blocs atomiques dont le style (police, taille, espacement) est **fixé une fois 
 | `{{table_border_color}}` | Couleur des bordures du tableau |
 | `{{callout_border_color}}` | Couleur de la bordure gauche de l'encadré |
 | `{{callout_bg_color}}` | Couleur de fond de l'encadré |
+| `{{chart_color_1}}` … `{{chart_color_4}}` | Couleurs des séries de graphiques |
 
 ---
 
@@ -59,6 +62,8 @@ Chaque template combiné définit :
 | `data_table_section` | Titre + Tableau (100 %) | Violette |
 | `cover_section` | Image + Grand titre + Sous-titre (100 %) | Marine/or |
 | `two_column_text` | Sous-titre + Paragraphe × 2 colonnes 50/50 | Teal |
+| `chart_section` | Titre + Graphique (100 %) | Bleue |
+| `flowchart_section` | Titre + Logigramme (100 %) | Bleue |
 
 ---
 
@@ -79,7 +84,9 @@ Combinent plusieurs templates combinés pour former une **page A4 portrait** com
 pip install -e .
 ```
 
-Dépendance unique : **python-docx ≥ 1.1.0**
+Dépendances : **python-docx ≥ 1.1.0** · **matplotlib ≥ 3.7** (graphiques et logigrammes complexes)
+
+> `cairosvg` est optionnel : s'il est installé, les logigrammes complexes sont convertis en PNG haute fidélité depuis le SVG. Sans lui, le rendu Word utilise matplotlib comme fallback.
 
 ---
 
@@ -273,6 +280,26 @@ Mise en page : deux colonnes 50/50, chacune avec **Sous-titre** + **Paragraphe**
 | `title` | **2** | 3 | `[0]` = colonne gauche · `[1]` = colonne droite |
 | `paragraph` | **2** | — | `[0]` = texte gauche · `[1]` = texte droit |
 
+#### `chart_section` — palette bleue
+
+Mise en page : **Titre** / **Graphique** (tout pleine largeur)
+
+| Clé `content` | Nb | `level` par défaut | Description |
+|---|---|---|---|
+| `title` | 1 | 2 | Titre de la section |
+| `chart` | 1 | — | Graphique matplotlib |
+
+#### `flowchart_section` — palette bleue
+
+Mise en page : **Titre** / **Logigramme** (tout pleine largeur)
+
+| Clé `content` | Nb | `level` par défaut | Description |
+|---|---|---|---|
+| `title` | 1 | 2 | Titre de la section |
+| `flowchart` | 1 | — | Logigramme simple ou complexe |
+
+> **Recommandation :** toujours utiliser `"flowchart_type": "simple"`. Le mode simple produit des formes Word natives et éditables, sans dépendance supplémentaire. Le mode `"complex"` est réservé aux graphes avec branches multiples et n'est rendu qu'en SVG (HTML) + PNG (Word).
+
 ---
 
 ### Format des objets de contenu par type singulier
@@ -370,6 +397,77 @@ Le nombre de colonnes est le maximum de `len(headers)` et de `max(len(row) for r
 
 Aucun champ requis. La clé peut être omise ou avoir pour valeur un objet vide.
 
+#### `chart`
+
+```json
+{
+  "chart_type": "bar",
+  "labels": ["Jan", "Fév", "Mar", "Avr"],
+  "datasets": [
+    { "label": "Série A", "values": [12, 18, 15, 22] },
+    { "label": "Série B", "values": [8, 14, 11, 19] }
+  ]
+}
+```
+
+| Champ | Type | Requis | Contrainte |
+|-------|------|--------|------------|
+| `chart_type` | string | **oui** | `"bar"` (barres verticales), `"barh"` (barres horizontales), `"line"` (courbes), `"pie"` (camembert) |
+| `labels` | tableau de strings | **oui** | Étiquettes des catégories ou de l'axe X |
+| `datasets` | tableau d'objets | **oui** | Au moins 1 dataset — chaque objet a `"label"` (string) et `"values"` (tableau de nombres) |
+
+> Pour `"pie"`, seul le premier dataset est utilisé.
+
+#### `flowchart`
+
+> **Utiliser systématiquement `"flowchart_type": "simple"`** — les formes sont des objets Word natifs (éditables) et la compatibilité est totale. Réserver `"complex"` uniquement quand le graphe contient des branches multiples indispensables.
+
+**Mode simple (recommandé) — séquence linéaire :**
+
+```json
+{
+  "flowchart_type": "simple",
+  "nodes": [
+    { "id": "1", "type": "start",    "text": "Début" },
+    { "id": "2", "type": "process",  "text": "Traiter la demande" },
+    { "id": "3", "type": "decision", "text": "Valide ?" },
+    { "id": "4", "type": "io",       "text": "Enregistrer" },
+    { "id": "5", "type": "end",      "text": "Fin" }
+  ]
+}
+```
+
+Les nœuds sont reliés dans l'ordre du tableau (pas d'`edges` nécessaire en mode simple).
+
+**Mode complexe — graphe avec branches :**
+
+```json
+{
+  "flowchart_type": "complex",
+  "nodes": [ ... ],
+  "edges": [
+    { "from": "3", "to": "4", "label": "Oui" },
+    { "from": "3", "to": "2", "label": "Non" }
+  ]
+}
+```
+
+**Types de nœuds disponibles :**
+
+| `type` | Forme | Couleur | Usage |
+|--------|-------|---------|-------|
+| `"start"` | Rectangle arrondi | Vert | Point d'entrée |
+| `"end"` | Rectangle arrondi | Rouge | Point de sortie |
+| `"process"` | Rectangle | Bleu | Étape de traitement |
+| `"decision"` | Losange | Orange | Condition / branchement |
+| `"io"` | Parallélogramme | Violet | Entrée / sortie de données |
+
+| Champ | Type | Requis | Contrainte |
+|-------|------|--------|------------|
+| `flowchart_type` | string | **oui** | `"simple"` (recommandé) ou `"complex"` |
+| `nodes` | tableau d'objets | **oui** | Chaque nœud a `"id"` (unique), `"type"` et `"text"` |
+| `edges` | tableau d'objets | mode complex | Chaque edge a `"from"`, `"to"` et `"label"` optionnel |
+
 ---
 
 ### Exemple complet
@@ -454,6 +552,8 @@ Pour produire un JSON valide à partir d'une description textuelle, suivre ces r
    | Texte + liste à puces | `"content_with_list"` |
    | Tableau de données | `"data_table_section"` |
    | Comparaison deux colonnes | `"two_column_text"` |
+   | Graphique (courbes, barres, camembert) | `"chart_section"` |
+   | Logigramme / processus | `"flowchart_section"` avec `"flowchart_type": "simple"` |
 
 2. **Respecter exactement les clés** de la table de référence du template choisi — aucune clé supplémentaire, aucune clé manquante parmi les requis.
 
@@ -553,6 +653,8 @@ doc_writer/
 ├── template_loader.py      # Chargement et résolution des JSON
 ├── word_writer.py          # Générateur Word (.docx)
 ├── html_writer.py          # Générateur HTML
+├── chart_utils.py          # Rendu matplotlib (bar, barh, line, pie)
+├── flowchart_utils.py      # Formes Word natives + SVG/PNG logigrammes
 └── templates/
     ├── singular/
     │   ├── paragraph.json
@@ -561,13 +663,17 @@ doc_writer/
     │   ├── image.json
     │   ├── table.json
     │   ├── callout.json
-    │   └── separator.json
+    │   ├── separator.json
+    │   ├── chart.json
+    │   └── flowchart.json
     ├── combined/
     │   ├── hero_section.json
     │   ├── content_with_list.json
     │   ├── data_table_section.json
     │   ├── cover_section.json
-    │   └── two_column_text.json
+    │   ├── two_column_text.json
+    │   ├── chart_section.json
+    │   └── flowchart_section.json
     └── pages/
         ├── standard_report_page.json
         └── cover_page.json
