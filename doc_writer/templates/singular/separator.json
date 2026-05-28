@@ -1,0 +1,8 @@
+{
+  "id": "separator",
+  "type": "separator",
+  "line_color": "{{text_color}}",
+  "line_width_pt": 0.5,
+  "margin_top_pt": 12,
+  "margin_bottom_pt": 12
+}

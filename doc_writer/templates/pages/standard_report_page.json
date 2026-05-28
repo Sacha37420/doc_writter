@@ -1,0 +1,14 @@
+{
+  "id": "standard_report_page",
+  "type": "page",
+  "name": "Page rapport standard",
+  "description": "Page A4 portrait combinant section héro, contenu avec liste et tableau de données",
+  "format": "A4",
+  "orientation": "portrait",
+  "margins_mm": { "top": 25, "bottom": 25, "left": 30, "right": 30 },
+  "sections": [
+    { "combined_template": "hero_section" },
+    { "combined_template": "content_with_list" },
+    { "combined_template": "data_table_section" }
+  ]
+}

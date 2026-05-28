@@ -1,0 +1,22 @@
+{
+  "id": "image",
+  "type": "image",
+  "frame": {
+    "border_color": "{{image_border_color}}",
+    "border_width_pt": 1.5,
+    "border_style": "single",
+    "padding_pt": 8,
+    "background_color": "#FAFAFA"
+  },
+  "caption": {
+    "font": {
+      "name": "Calibri",
+      "size": 9,
+      "bold": false,
+      "italic": true,
+      "color": "{{text_color}}"
+    },
+    "alignment": "center"
+  },
+  "placeholder_label": "[ IMAGE ]"
+}

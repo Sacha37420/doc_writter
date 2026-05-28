@@ -1,0 +1,55 @@
+{
+  "id": "content_with_list",
+  "type": "combined",
+  "name": "Section contenu avec liste à puces",
+  "description": "Titre pleine largeur, paragraphe d'introduction et liste à puces",
+  "color_palette": {
+    "title_color": "#1E5631",
+    "text_color": "#2D3436",
+    "bullet_color": "#27AE60",
+    "list_text_color": "#4A4A4A",
+    "image_border_color": "#82E0AA",
+    "table_header_bg": "#1E5631",
+    "table_border_color": "#82E0AA",
+    "callout_border_color": "#27AE60",
+    "callout_bg_color": "#EAFAF1"
+  },
+  "layout": {
+    "type": "grid",
+    "rows": [
+      {
+        "height": "auto",
+        "columns": [
+          {
+            "width_pct": 100,
+            "components": [
+              { "singular_template": "title", "level": 2 }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "auto",
+        "columns": [
+          {
+            "width_pct": 100,
+            "components": [
+              { "singular_template": "paragraph" }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "auto",
+        "columns": [
+          {
+            "width_pct": 100,
+            "components": [
+              { "singular_template": "bullet_list" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

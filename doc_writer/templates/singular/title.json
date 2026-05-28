@@ -1,0 +1,36 @@
+{
+  "id": "title",
+  "type": "title",
+  "levels": {
+    "1": {
+      "font": {
+        "name": "Calibri",
+        "size": 22,
+        "bold": true,
+        "italic": false,
+        "color": "{{title_color}}"
+      },
+      "spacing": { "before_pt": 14, "after_pt": 8 }
+    },
+    "2": {
+      "font": {
+        "name": "Calibri",
+        "size": 16,
+        "bold": true,
+        "italic": false,
+        "color": "{{title_color}}"
+      },
+      "spacing": { "before_pt": 10, "after_pt": 6 }
+    },
+    "3": {
+      "font": {
+        "name": "Calibri",
+        "size": 13,
+        "bold": true,
+        "italic": true,
+        "color": "{{title_color}}"
+      },
+      "spacing": { "before_pt": 8, "after_pt": 4 }
+    }
+  }
+}

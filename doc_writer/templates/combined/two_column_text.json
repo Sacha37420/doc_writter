@@ -1,0 +1,41 @@
+{
+  "id": "two_column_text",
+  "type": "combined",
+  "name": "Section deux colonnes de texte",
+  "description": "Deux colonnes égales avec chacune un sous-titre et un paragraphe",
+  "color_palette": {
+    "title_color": "#0E6655",
+    "text_color": "#2D3436",
+    "bullet_color": "#17A589",
+    "list_text_color": "#4A4A4A",
+    "image_border_color": "#76D7C4",
+    "table_header_bg": "#0E6655",
+    "table_border_color": "#76D7C4",
+    "callout_border_color": "#17A589",
+    "callout_bg_color": "#E8F8F5"
+  },
+  "layout": {
+    "type": "grid",
+    "rows": [
+      {
+        "height": "auto",
+        "columns": [
+          {
+            "width_pct": 50,
+            "components": [
+              { "singular_template": "title", "level": 3 },
+              { "singular_template": "paragraph" }
+            ]
+          },
+          {
+            "width_pct": 50,
+            "components": [
+              { "singular_template": "title", "level": 3 },
+              { "singular_template": "paragraph" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

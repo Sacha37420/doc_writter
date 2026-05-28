@@ -1,0 +1,12 @@
+{
+  "id": "cover_page",
+  "type": "page",
+  "name": "Page de couverture",
+  "description": "Page de couverture A4 portrait avec image, titre principal et sous-titre",
+  "format": "A4",
+  "orientation": "portrait",
+  "margins_mm": { "top": 40, "bottom": 40, "left": 40, "right": 40 },
+  "sections": [
+    { "combined_template": "cover_section" }
+  ]
+}

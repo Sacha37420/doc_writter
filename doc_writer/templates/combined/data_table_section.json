@@ -1,0 +1,44 @@
+{
+  "id": "data_table_section",
+  "type": "combined",
+  "name": "Section tableau de données",
+  "description": "Titre pleine largeur suivi d'un tableau de données",
+  "color_palette": {
+    "title_color": "#4A235A",
+    "text_color": "#2D3436",
+    "bullet_color": "#8E44AD",
+    "list_text_color": "#4A4A4A",
+    "image_border_color": "#D7BDE2",
+    "table_header_bg": "#4A235A",
+    "table_border_color": "#D7BDE2",
+    "callout_border_color": "#8E44AD",
+    "callout_bg_color": "#F5EEF8"
+  },
+  "layout": {
+    "type": "grid",
+    "rows": [
+      {
+        "height": "auto",
+        "columns": [
+          {
+            "width_pct": 100,
+            "components": [
+              { "singular_template": "title", "level": 2 }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "auto",
+        "columns": [
+          {
+            "width_pct": 100,
+            "components": [
+              { "singular_template": "table" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

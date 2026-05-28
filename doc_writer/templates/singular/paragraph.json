@@ -1,0 +1,17 @@
+{
+  "id": "paragraph",
+  "type": "paragraph",
+  "font": {
+    "name": "Calibri",
+    "size": 11,
+    "bold": false,
+    "italic": false,
+    "color": "{{text_color}}"
+  },
+  "alignment": "left",
+  "spacing": {
+    "before_pt": 6,
+    "after_pt": 6,
+    "line_spacing": 1.15
+  }
+}

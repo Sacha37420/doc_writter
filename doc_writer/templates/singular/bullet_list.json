@@ -1,0 +1,22 @@
+{
+  "id": "bullet_list",
+  "type": "bullet_list",
+  "bullet": {
+    "symbol": "•",
+    "color": "{{bullet_color}}",
+    "size": 11
+  },
+  "font": {
+    "name": "Calibri",
+    "size": 11,
+    "bold": false,
+    "italic": false,
+    "color": "{{list_text_color}}"
+  },
+  "indent_pt": 18,
+  "spacing": {
+    "before_pt": 2,
+    "after_pt": 2,
+    "line_spacing": 1.15
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "callout",
+  "type": "callout",
+  "border_left_width_pt": 4,
+  "border_left_color": "{{callout_border_color}}",
+  "background_color": "{{callout_bg_color}}",
+  "padding_pt": 10,
+  "font": {
+    "name": "Calibri",
+    "size": 11,
+    "bold": false,
+    "italic": false,
+    "color": "{{text_color}}"
+  },
+  "label_font": {
+    "name": "Calibri",
+    "size": 10,
+    "bold": true,
+    "italic": false,
+    "color": "{{callout_border_color}}"
+  },
+  "spacing": {
+    "before_pt": 8,
+    "after_pt": 8
+  }
+}
