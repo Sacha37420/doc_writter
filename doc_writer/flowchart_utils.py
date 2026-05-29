@@ -161,7 +161,7 @@ def build_word_simple_flowchart(nodes: list[dict], tpl: dict):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def build_simple_svg(nodes: list[dict], tpl: dict) -> str:
-    CX = _S_W // 2
+    # compute node widths/heights and dynamic canvas width so text is not clipped
     defs = (
         '<defs>'
         '<marker id="ah" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">'
@@ -171,15 +171,32 @@ def build_simple_svg(nodes: list[dict], tpl: dict) -> str:
     parts = [defs]
     y = 10
     pos: list[tuple[int, int, int, int]] = []
-
+    # first pass: determine sizes and vertical layout
+    sizes: list[tuple[int, int]] = []
     for node in nodes:
         is_d = node.get("type") == "decision"
         w, h = (_S_DW, _S_DH) if is_d else (_S_NW, _S_NH)
-        pos.append((CX - w // 2, y, w, h))
+        sizes.append((w, h))
+        y += 0  # keep same baseline progression below
+
+    # compute total height and spacing
+    y = 10
+    for w, h in sizes:
+        pos.append((0, y, w, h))
         y += h + _S_GAP + _S_ARR
 
     total_h = y - _S_GAP - _S_ARR + 10
 
+    # compute canvas width dynamically to avoid clipping; center nodes
+    max_w = max((w for w, _ in sizes), default=_S_NW)
+    padding_x = 40
+    canvas_w = max(_S_W, max_w + padding_x)
+    CX = canvas_w // 2
+
+    # update positions with centered x
+    pos = [(CX - w // 2, py, w, h) for (_, py, w, h), (w, h) in zip(pos, sizes)]
+
+    # connector lines between nodes
     for i in range(len(nodes) - 1):
         px, py, pw, ph = pos[i]
         pcx = px + pw // 2
@@ -210,15 +227,22 @@ def build_simple_svg(nodes: list[dict], tpl: dict) -> str:
             parts.append(f'<rect x="{x}" y="{py}" width="{w}" height="{h}" '
                          f'fill="{fill}" stroke="{stroke}" stroke-width="2"/>')
 
-        parts.append(
-            f'<text x="{cx_s}" y="{cy_s}" text-anchor="middle" dominant-baseline="middle" '
-            f'fill="white" font-family="Calibri,Arial,sans-serif" '
-            f'font-size="11" font-weight="bold">{text}</text>'
+        # use foreignObject to allow wrapped, centered text inside the node
+        fo_style = (
+            "display:flex;align-items:center;justify-content:center;" 
+            "text-align:center;color:white;" 
+            "font-family:Calibri,Arial,sans-serif;" 
+            "font-weight:bold;overflow:hidden;" 
+            "word-wrap:break-word;white-space:normal;padding:4px;"
         )
-
+        parts.append(
+            f'<foreignObject x="{x}" y="{py}" width="{w}" height="{h}">'
+            f'<div xmlns="http://www.w3.org/1999/xhtml" style="{fo_style};font-size:11px">{text}</div>'
+            f'</foreignObject>'
+        )
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" '
-        f'width="{_S_W}" height="{total_h}" viewBox="0 0 {_S_W} {total_h}">'
+        f'width="{canvas_w}" height="{total_h}" viewBox="0 0 {canvas_w} {total_h}">'
         + "\n".join(parts) + '</svg>'
     )
 
