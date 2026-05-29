@@ -448,6 +448,95 @@ def build_complex_svg(nodes: list[dict], edges: list[dict], tpl: dict) -> str:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# PNG conversion for simple flowchart (Word)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _simple_matplotlib_png(nodes: list[dict], font_pt: int = 8) -> BytesIO:
+    import textwrap
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+
+    NW, NH = 2.4, 0.50
+    DW, DH = 2.3, 0.75
+    V_GAP, ARR_H, MARGIN = 0.30, 0.20, 0.25
+
+    def dims(n: dict) -> tuple[float, float]:
+        return (DW, DH) if n.get("type") == "decision" else (NW, NH)
+
+    sizes = [dims(n) for n in nodes]
+    total_h = (MARGIN * 2
+               + sum(h for _, h in sizes)
+               + (V_GAP + ARR_H) * max(0, len(nodes) - 1))
+    total_w = max((w for w, _ in sizes), default=NW) + 0.8
+
+    dpi = 150
+    fig, ax = plt.subplots(figsize=(total_w, total_h))
+    ax.set_xlim(0, total_w)
+    ax.set_ylim(0, total_h)
+    ax.axis("off")
+    ax.set_facecolor("white")
+    fig.patch.set_facecolor("white")
+
+    CX = total_w / 2
+    y = total_h - MARGIN
+
+    positions: list[tuple[float, float, float, float]] = []
+    for w, h in sizes:
+        cy = y - h / 2
+        positions.append((CX, cy, w, h))
+        y -= h + V_GAP + ARR_H
+
+    for i in range(len(nodes) - 1):
+        _, cy, _, h = positions[i]
+        _, ny, _, nh = positions[i + 1]
+        ax.annotate("", xy=(CX, ny + nh / 2 + 0.02),
+                    xytext=(CX, cy - h / 2 - 0.02),
+                    arrowprops=dict(arrowstyle="->", color="#555", lw=1.2))
+
+    for node, (cx, cy, w, h) in zip(nodes, positions):
+        ntype = node.get("type", "process")
+        f_hex, b_hex = _STYLE.get(ntype, _STYLE["process"])
+        fill, border = f"#{f_hex}", f"#{b_hex}"
+
+        if ntype == "decision":
+            ax.add_patch(plt.Polygon(
+                [[cx, cy + h/2], [cx + w/2, cy], [cx, cy - h/2], [cx - w/2, cy]],
+                closed=True, facecolor=fill, edgecolor=border, linewidth=1.5, zorder=2,
+            ))
+        elif ntype in ("start", "end"):
+            ax.add_patch(mpatches.FancyBboxPatch(
+                (cx - w/2, cy - h/2), w, h,
+                boxstyle=f"round,pad=0,rounding_size={h/2}",
+                facecolor=fill, edgecolor=border, linewidth=1.5, zorder=2,
+            ))
+        else:
+            ax.add_patch(mpatches.FancyBboxPatch(
+                (cx - w/2, cy - h/2), w, h,
+                boxstyle="round,pad=0,rounding_size=0.04",
+                facecolor=fill, edgecolor=border, linewidth=1.5, zorder=2,
+            ))
+
+        label = textwrap.fill(node.get("text", ""), width=22)
+        ax.text(cx, cy, label, ha="center", va="center",
+                fontsize=font_pt, color="white", fontweight="bold",
+                zorder=3, linespacing=1.3)
+
+    fig.tight_layout(pad=0.2)
+    buf = BytesIO()
+    fig.savefig(buf, format="png", dpi=dpi, facecolor="white", bbox_inches="tight")
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
+def build_simple_png_for_word(nodes: list[dict], tpl: dict) -> BytesIO:
+    """Simple (linear) flowchart → PNG for Word embedding."""
+    return _simple_matplotlib_png(nodes, font_pt=int(tpl.get("font_size", 8)))
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # PNG conversion for complex flowchart (Word)
 # ═══════════════════════════════════════════════════════════════════════════════
 
