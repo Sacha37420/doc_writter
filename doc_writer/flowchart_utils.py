@@ -62,11 +62,12 @@ _W   = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 def _wshape(x: int, y: int, w: int, h: int,
             geom: str, fill: str, border: str,
-            text: str, font_pt: int = 9) -> str:
+            text: str, font_pt: int = 9, sp_id: int = 1) -> str:
     hz = int(font_pt * 2)
     t = _html.escape(text, quote=True)
     return (
         f'<wps:wsp xmlns:wps="{_WPS}" xmlns:a="{_A}" xmlns:w="{_W}">'
+        f'<wps:cNvPr id="{sp_id}" name="sp{sp_id}"/>'
         '<wps:cNvSpPr txBx="1"><a:spLocks noChangeArrowheads="1"/></wps:cNvSpPr>'
         '<wps:spPr>'
         f'<a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{w}" cy="{h}"/></a:xfrm>'
@@ -85,7 +86,7 @@ def _wshape(x: int, y: int, w: int, h: int,
     )
 
 
-def _wconn(x1: int, y1: int, x2: int, y2: int) -> str:
+def _wconn(x1: int, y1: int, x2: int, y2: int, sp_id: int = 100) -> str:
     ox, oy = min(x1, x2), min(y1, y2)
     cw = max(abs(x2 - x1), 914)
     ch = max(abs(y2 - y1), 914)
@@ -93,6 +94,7 @@ def _wconn(x1: int, y1: int, x2: int, y2: int) -> str:
     fv = "1" if y2 < y1 else "0"
     return (
         f'<wps:wsp xmlns:wps="{_WPS}" xmlns:a="{_A}">'
+        f'<wps:cNvPr id="{sp_id}" name="cn{sp_id}"/>'
         '<wps:cNvCxnSpPr/>'
         '<wps:spPr>'
         f'<a:xfrm flipH="{fh}" flipV="{fv}">'
@@ -123,15 +125,18 @@ def build_word_simple_flowchart(nodes: list[dict], tpl: dict):
     total_h = y - _GAP
 
     parts: list[str] = []
+    sp_id = 1
     for i, (node, (px, py, pw, ph)) in enumerate(zip(nodes, pos)):
         ntype = node.get("type", "process")
         fill, border = _STYLE.get(ntype, _STYLE["process"])
         parts.append(_wshape(px, py, pw, ph, _GEOM.get(ntype, "rect"),
-                             fill, border, node.get("text", ""), font_pt))
+                             fill, border, node.get("text", ""), font_pt, sp_id))
+        sp_id += 1
         if i < len(nodes) - 1:
             _, ny, _, _ = pos[i + 1]
             mid = _CANW // 2
-            parts.append(_wconn(mid, py + ph, mid, ny))
+            parts.append(_wconn(mid, py + ph, mid, ny, sp_id))
+            sp_id += 1
 
     inner = "".join(parts)
     xml = (
@@ -144,6 +149,7 @@ def build_word_simple_flowchart(nodes: list[dict], tpl: dict):
         f'<a:graphic xmlns:a="{_A}">'
         f'<a:graphicData uri="{_WPG}">'
         f'<wpg:wgp xmlns:wpg="{_WPG}">'
+        '<wpg:cNvPr id="0" name=""/>'
         '<wpg:cNvGrpSpPr/>'
         '<wpg:grpSpPr>'
         f'<a:xfrm><a:off x="0" y="0"/><a:ext cx="{_CANW}" cy="{total_h}"/>'
@@ -227,12 +233,12 @@ def build_simple_svg(nodes: list[dict], tpl: dict) -> str:
             parts.append(f'<rect x="{x}" y="{py}" width="{w}" height="{h}" '
                          f'fill="{fill}" stroke="{stroke}" stroke-width="2"/>')
 
-        # use foreignObject to allow wrapped, centered text inside the node
         fo_style = (
-            "display:flex;align-items:center;justify-content:center;" 
-            "text-align:center;color:white;" 
-            "font-family:Calibri,Arial,sans-serif;" 
-            "font-weight:bold;overflow:hidden;" 
+            "width:100%;height:100%;box-sizing:border-box;"
+            "display:flex;align-items:center;justify-content:center;"
+            "text-align:center;color:white;"
+            "font-family:Calibri,Arial,sans-serif;"
+            "font-weight:bold;overflow:hidden;"
             "word-wrap:break-word;white-space:normal;padding:4px;"
         )
         parts.append(
@@ -419,10 +425,18 @@ def build_complex_svg(nodes: list[dict], edges: list[dict], tpl: dict) -> str:
             parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" '
                          f'fill="{gurl}" stroke="{stroke}" stroke-width="2" {filt}/>')
 
+        fo_c = (
+            "width:100%;height:100%;box-sizing:border-box;"
+            "display:flex;align-items:center;justify-content:center;"
+            "text-align:center;color:white;"
+            "font-family:Calibri,Arial,sans-serif;"
+            "font-weight:bold;overflow:hidden;"
+            "word-wrap:break-word;white-space:normal;padding:3px;"
+        )
         parts.append(
-            f'<text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="middle" '
-            f'fill="white" font-family="Calibri,Arial,sans-serif" '
-            f'font-size="10" font-weight="bold">{text}</text>'
+            f'<foreignObject x="{x}" y="{y}" width="{w}" height="{h}">'
+            f'<div xmlns="http://www.w3.org/1999/xhtml" style="{fo_c};font-size:10px">{text}</div>'
+            f'</foreignObject>'
         )
 
     return (
