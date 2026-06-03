@@ -10,7 +10,7 @@ def caption_to_slug(caption: str) -> str:
     s = caption.lower().strip()
     s = re.sub(r"[^\w\s-]", "", s)
     s = re.sub(r"[\s_]+", "_", s)
-    return s[:40].strip("_") or "image"
+    return s.strip("_") or "image"
 
 
 def generate_placeholder_png(caption: str) -> bytes:
