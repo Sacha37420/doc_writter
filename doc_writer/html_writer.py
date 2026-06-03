@@ -31,6 +31,7 @@ class HtmlDocumentWriter(BaseDocumentWriter):
         super().__init__(custom_templates_dir)
         self._blocks: list[str] = []
         self._body_style = "padding: 12mm 15mm;"
+        self._pending_images: list[dict] = []
 
     # ------------------------------------------------------------------
     # Page setup
@@ -165,7 +166,6 @@ class HtmlDocumentWriter(BaseDocumentWriter):
     def _html_image(self, tpl: dict, content: dict) -> str:
         frame = tpl.get("frame", {})
         caption_def = tpl.get("caption", {})
-        path = content.get("path")
         caption_text = content.get("caption", "")
 
         border_color = frame.get("border_color", "#CCCCCC")
@@ -181,14 +181,10 @@ class HtmlDocumentWriter(BaseDocumentWriter):
             f";margin:4pt 0"
         )
 
-        if path:
-            inner = f'<img src="{_html.escape(str(path))}" style="max-width:100%;height:auto;">'
-        else:
-            label = _html.escape(tpl.get("placeholder_label", "[ IMAGE ]"))
-            inner = (
-                f'<div style="background:#ECECEC;padding:40px 20px;'
-                f'color:#999;font-style:italic;">{label}</div>'
-            )
+        # Token replaced at save() time with an embedded base64 <img>
+        idx = len(self._pending_images)
+        self._pending_images.append({"tpl": tpl, "content": content})
+        inner = f"<!--IMG:{idx}-->"
 
         caption_html = ""
         if caption_text:
@@ -306,10 +302,25 @@ class HtmlDocumentWriter(BaseDocumentWriter):
     # ------------------------------------------------------------------
 
     def save(self, output_path: str | Path) -> None:
+        import base64
+        from .image_utils import resolve_image_bytes
+
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
+        assets_dir = out.parent / "assets"
 
         body_content = "\n".join(self._blocks)
+        for i, item in enumerate(self._pending_images):
+            img_bytes, filename = resolve_image_bytes(item["content"], assets_dir, i)
+            b64 = base64.b64encode(img_bytes).decode()
+            ext = Path(filename).suffix.lstrip(".").lower()
+            mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext or 'png'}"
+            img_tag = (
+                f'<img src="data:{mime};base64,{b64}" '
+                f'style="max-width:100%;height:auto;">'
+            )
+            body_content = body_content.replace(f"<!--IMG:{i}-->", img_tag)
+
         doc = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>

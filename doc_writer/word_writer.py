@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from io import BytesIO
 from pathlib import Path
 
 from docx import Document
@@ -141,7 +142,8 @@ class WordDocumentWriter(BaseDocumentWriter):
     def __init__(self, custom_templates_dir: Path | str | None = None):
         super().__init__(custom_templates_dir)
         self._doc = Document()
-        self._content_width_cm: float = _A4_WIDTH_CM - 6.0  # default margins 3cm each side
+        self._content_width_cm: float = _A4_WIDTH_CM - 6.0
+        self._pending_images: list[dict] = []
 
     # ------------------------------------------------------------------
     # Page setup
@@ -252,28 +254,17 @@ class WordDocumentWriter(BaseDocumentWriter):
             _apply_font(para.add_run(str(item)), font_def)
 
     def _write_image(self, container, tpl: dict, content: dict) -> None:
-        frame = tpl.get("frame", {})
         caption_def = tpl.get("caption", {})
-        path = content.get("path")
         caption_text = content.get("caption", "")
 
-        if path:
-            from docx.shared import Inches
-            para = _para_in(container)
-            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            para.add_run().add_picture(str(path), width=Inches(4))
-        else:
-            placeholder = tpl.get("placeholder_label", "[ IMAGE ]")
-            img_tbl = _add_table(container, self._doc, 1, 1)
-            ph_cell = img_tbl.rows[0].cells[0]
-            _set_cell_borders(ph_cell, frame.get("border_color", "#CCCCCC"), frame.get("border_width_pt", 1.5))
-            _set_cell_shading(ph_cell, frame.get("background_color", "#FAFAFA"))
-            p = ph_cell.paragraphs[0]
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            run = p.add_run(f"\n{placeholder}\n")
-            run.font.color.rgb = RGBColor(153, 153, 153)
-            run.font.italic = True
-            run.font.size = Pt(12)
+        # Empty paragraph; picture will be added at save() once assets_dir is known
+        img_para = _para_in(container)
+        img_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        self._pending_images.append({
+            "para": img_para,
+            "tpl": tpl,
+            "content": content,
+        })
 
         if caption_text:
             cap_para = container.add_paragraph()
@@ -402,6 +393,15 @@ class WordDocumentWriter(BaseDocumentWriter):
     # ------------------------------------------------------------------
 
     def save(self, output_path: str | Path) -> None:
+        from docx.shared import Inches
+        from .image_utils import resolve_image_bytes
+
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
+        assets_dir = out.parent / "assets"
+
+        for i, item in enumerate(self._pending_images):
+            img_bytes, _ = resolve_image_bytes(item["content"], assets_dir, i)
+            item["para"].add_run().add_picture(BytesIO(img_bytes), width=Inches(4))
+
         self._doc.save(str(out))
