@@ -610,7 +610,7 @@ Utilise le module `doc_writer` pour générer la documentation utilisateur de ce
 **Étapes à faire dans l'ordre :**
 
 1. Crée un environnement virtuel `.venv` s'il n'existe pas, et installe `doc_writer` dedans :
-   pip install git+https://github.com/sacha-mailler/doc_writter.git
+   pip install git+https://github.com/sacha37420/doc_writter.git
 
 2. Lis le README de `doc_writer` pour comprendre le format JSON attendu — en particulier
    la section "Format JSON de document" et le "Guide de génération pour une IA".
